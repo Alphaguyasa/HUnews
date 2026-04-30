@@ -62,12 +62,31 @@ import 'package:http/http.dart' as http;
 import '../models/post_model.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://ssgi.gov.et/wp-json/wp/v2/posts';
+  static const String baseUrl = 'https://www.haramaya.edu.et/wp-json/wp/v2/posts';
+  static const String _categorySlug = 'news';
+  static int? _newsCategoryId;
+
+  static Future<int?> _fetchNewsCategoryId() async {
+    if (_newsCategoryId != null) return _newsCategoryId;
+    final response = await http.get(
+      Uri.parse('https://www.haramaya.edu.et/wp-json/wp/v2/categories?slug=$_categorySlug'),
+    );
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      if (data.isNotEmpty) {
+        _newsCategoryId = data[0]['id'];
+        return _newsCategoryId;
+      }
+    }
+    return null;
+  }
 
   static Future<List<Post>> fetchPostsByPage(int page) async {
     const int perPage = 10;
+    final categoryId = await _fetchNewsCategoryId();
+    final categoryParam = categoryId != null ? '&categories=$categoryId' : '';
     final response = await http.get(
-      Uri.parse('$baseUrl?page=$page&per_page=$perPage'),
+      Uri.parse('$baseUrl?page=$page&per_page=$perPage$categoryParam&_embed=true'),
     );
 
     if (response.statusCode == 200) {

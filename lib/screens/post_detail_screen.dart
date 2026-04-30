@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/post_model.dart';
 
 class PostDetailScreen extends StatefulWidget {
@@ -35,6 +36,20 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     return days[date.weekday % 7];
   }
 
+  Future<void> _sharePost() async {
+    await Share.share('${widget.post.title}\n\n${widget.post.link}');
+  }
+
+  void _showReactionSnackbar(String reaction) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('You reacted with $reaction!'),
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   // Function to reset all reactions except the one tapped
   void resetOtherReactions(String tapped) {
     if (tapped != 'like' && isLiked) {
@@ -66,6 +81,13 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share, color: Colors.white),
+            onPressed: _sharePost,
+            tooltip: 'Share',
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -153,6 +175,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             resetOtherReactions('like');
                             isLiked = true;
                             likeCount++;
+                            _showReactionSnackbar('👍 Like');
                           } else {
                             isLiked = false;
                             likeCount--;
@@ -176,6 +199,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             resetOtherReactions('dislike');
                             isDisliked = true;
                             dislikeCount++;
+                            _showReactionSnackbar('👎 Dislike');
                           } else {
                             isDisliked = false;
                             dislikeCount--;
@@ -199,6 +223,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             resetOtherReactions('heart');
                             isHearted = true;
                             heartCount++;
+                            _showReactionSnackbar('❤️ Heart');
                           } else {
                             isHearted = false;
                             heartCount--;
@@ -222,6 +247,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             resetOtherReactions('fire');
                             isFired = true;
                             fireCount++;
+                            _showReactionSnackbar('🔥 Fire');
                           } else {
                             isFired = false;
                             fireCount--;

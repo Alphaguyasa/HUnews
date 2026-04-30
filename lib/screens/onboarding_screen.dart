@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'home_screen.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
+
+  Future<void> _requestPermissionsAndNavigate(BuildContext context) async {
+    await Permission.notification.request();
+    if (context.mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,36 +28,42 @@ class OnboardingScreen extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              height: screenHeight * 0.5,
+              height: screenHeight * 0.45,
               width: screenWidth,
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(25),
                   bottomRight: Radius.circular(25),
                 ),
-                color: Colors.transparent,
+                color: Colors.white10,
               ),
               clipBehavior: Clip.antiAlias,
               child: Image.network(
-                'https://ssgi.gov.et/wp-content/uploads/2023/04/ssgi-logo-final-e1689234235773.png',
-                fit: BoxFit.fill,
+                'https://www.haramaya.edu.et/wp-content/uploads/2020/09/HU-Logo.png',
+                fit: BoxFit.contain,
                 loadingBuilder: (context, child, progress) {
                   if (progress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: progress.expectedTotalBytes != null
-                          ? progress.cumulativeBytesLoaded /
-                          progress.expectedTotalBytes!
-                          : null,
-                      color: Colors.white,
-                    ),
+                  return const Center(
+                    child: CircularProgressIndicator(color: Colors.white),
                   );
                 },
-                errorBuilder: (context, error, stackTrace) => const Center(
-                  child: Icon(
-                    Icons.broken_image,
-                    color: Colors.white,
-                    size: 100,
+                errorBuilder: (context, error, stackTrace) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.school, color: Colors.white, size: 100),
+                      SizedBox(height: 16),
+                      Text(
+                        'HARAMAYA\nUNIVERSITY',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -59,7 +76,7 @@ class OnboardingScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'Welcome to SSGI News',
+                      'Welcome to Haramaya University News',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
@@ -69,7 +86,7 @@ class OnboardingScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      'Get the latest updates and news directly from the Space Science & Geospatial Institute (SSGI).',
+                      'Get the latest updates and news directly from Haramaya University (HU).',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white70,
@@ -92,11 +109,7 @@ class OnboardingScreen extends StatelessWidget {
                           shadowColor: Colors.black45,
                         ),
                         onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const HomeScreen()),
-                          );
+                          _requestPermissionsAndNavigate(context);
                         },
                         child: const Text(
                           'Get Started',

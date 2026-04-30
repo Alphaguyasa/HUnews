@@ -23,8 +23,8 @@ class _SearchScreenState extends State<SearchScreen> {
     setState(() {
       filteredPosts = allPosts
           .where((post) =>
-      (post.title ?? "").toLowerCase().contains(keyword) ||
-          (post.excerpt ?? "").toLowerCase().contains(keyword))
+      post.title.toLowerCase().contains(keyword) ||
+          post.excerpt.toLowerCase().contains(keyword))
           .toList();
     });
   }
@@ -118,9 +118,9 @@ class _SearchScreenState extends State<SearchScreen> {
                             children: [
                               // Post image
                               CachedNetworkImage(
-                                imageUrl: post.imageUrl?.isNotEmpty == true
+                                imageUrl: post.imageUrl != null && post.imageUrl!.isNotEmpty
                                     ? post.imageUrl!
-                                    : 'https://ssgi.gov.et/wp-content/uploads/2023/04/header-logo.jpg',
+                                    : 'https://www.haramaya.edu.et/wp-content/uploads/2020/09/HU-Logo.png',
                                 height: 180,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
@@ -163,11 +163,11 @@ class _SearchScreenState extends State<SearchScreen> {
                               children: [
                                 RichText(
                                   text: _highlightText(
-                                      post.title ?? "", keyword,
+                                      post.title, keyword,
                                       const Color(0xFF1B365D)),
                                 ),
                                 const SizedBox(height: 8),
-                                HtmlWidget(post.excerpt ?? ""),
+                                HtmlWidget(post.excerpt),
                               ],
                             ),
                           ),

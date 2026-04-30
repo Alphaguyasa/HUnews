@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/post_model.dart';
 
 import '../services/api_service.dart';
@@ -31,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _loadDarkModePreference();
     loadPosts();
 
     _scrollController.addListener(() {
@@ -39,6 +41,18 @@ class _HomeScreenState extends State<HomeScreen> {
         if (!isLoading && hasMore) loadPosts();
       }
     });
+  }
+
+  Future<void> _loadDarkModePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isDarkMode = prefs.getBool('isDarkMode') ?? false;
+    });
+  }
+
+  Future<void> _saveDarkModePreference(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDarkMode', value);
   }
 
   Future<void> loadPosts() async {
@@ -56,6 +70,22 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       hasMore = false;
       debugPrint("Failed to load posts: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Failed to load news. Check your connection.'),
+            backgroundColor: Colors.redAccent,
+            action: SnackBarAction(
+              label: 'Retry',
+              textColor: Colors.white,
+              onPressed: () {
+                setState(() => hasMore = true);
+                loadPosts();
+              },
+            ),
+          ),
+        );
+      }
     }
 
     setState(() => isLoading = false);
@@ -84,10 +114,10 @@ class _HomeScreenState extends State<HomeScreen> {
         scrollToTop();
         break;
       case 1:
-        _launchURL("https://t.me/spacegeospatial");
+        _launchURL("https://t.me/haramayauniversity");
         break;
       case 2:
-        _launchURL("https://ssgi.gov.et/");
+        _launchURL("https://www.haramaya.edu.et/");
         break;
       case 3:
         Navigator.push(
@@ -112,6 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       isDarkMode = !isDarkMode;
     });
+    _saveDarkModePreference(isDarkMode);
   }
 
   @override
@@ -136,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               CachedNetworkImage(
                 imageUrl:
-                'https://ssgi.gov.et/wp-content/uploads/2023/04/header-logo.jpg',
+                'https://www.haramaya.edu.et/wp-content/uploads/2020/09/HU-Logo.png',
                 width: 90,
                 height: 90,
                 fit: BoxFit.contain,
@@ -147,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(width: 12),
               const Text(
-                "SSGI News",
+                "HU News",
                 style: TextStyle(
                     fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
               ),
@@ -181,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Color(0xFF1B365D))),
                   ),
                   SizedBox(
-                    height: 230,
+                    height: 260,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: featuredPosts.length,
@@ -198,26 +229,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                       PostDetailScreen(post: post)),
                             ),
                             child: SizedBox(
-                              width: 300,
+                              width: 280,
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16)),
                                 clipBehavior: Clip.antiAlias,
                                 child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     CachedNetworkImage(
-                                      imageUrl: post.imageUrl?.isNotEmpty == true
+                                      imageUrl: post.imageUrl != null && post.imageUrl!.isNotEmpty
                                           ? post.imageUrl!
-                                          : 'https://ssgi.gov.et/wp-content/uploads/2023/04/header-logo.jpg',
-                                      height: 130,
+                                          : 'https://www.haramaya.edu.et/wp-content/uploads/2020/09/HU-Logo.png',
+                                      height: 160,
                                       width: double.infinity,
                                       fit: BoxFit.cover,
                                       placeholder: (context, url) =>
                                           Container(
                                             color: Colors.grey[300],
-                                            height: 140,
+                                            height: 160,
                                             child: const Center(
                                                 child: Icon(Icons.image,
                                                     color: Colors.grey,
@@ -226,21 +256,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                       errorWidget: (context, url, error) =>
                                           Container(
                                             color: Colors.grey[300],
-                                            height: 140,
+                                            height: 160,
                                             child: const Center(
                                                 child: Icon(Icons.broken_image,
                                                     color: Colors.grey,
                                                     size: 50)),
                                           ),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Text(
-                                        post.title ?? "",
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.orange),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          post.title,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.orange),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -286,9 +320,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               CrossAxisAlignment.start,
                               children: [
                                 CachedNetworkImage(
-                                  imageUrl: post.imageUrl?.isNotEmpty == true
+                                  imageUrl: post.imageUrl != null && post.imageUrl!.isNotEmpty
                                       ? post.imageUrl!
-                                      : 'https://ssgi.gov.et/wp-content/uploads/2023/04/header-logo.jpg',
+                                      : 'https://www.haramaya.edu.et/wp-content/uploads/2020/09/HU-Logo.png',
                                   width: double.infinity,
                                   height: 180,
                                   fit: BoxFit.cover,
@@ -315,12 +349,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                     crossAxisAlignment:
                                     CrossAxisAlignment.start,
                                     children: [
-                                      Text(post.title ?? "",
+                                      Text(post.title,
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               color: Colors.orange)),
                                       const SizedBox(height: 8),
-                                      HtmlWidget(post.excerpt ?? ""),
+                                      HtmlWidget(post.excerpt),
                                     ],
                                   ),
                                 ),
@@ -376,7 +410,7 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(30),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 5)),
               ],
@@ -406,7 +440,7 @@ class _HomeScreenState extends State<HomeScreen> {
         duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? activeColor.withOpacity(0.15) : Colors.transparent,
+          color: isSelected ? activeColor.withValues(alpha: 0.15) : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
