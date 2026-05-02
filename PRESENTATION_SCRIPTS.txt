@@ -1,0 +1,456 @@
+================================================================================
+                    PRESENTATION SCRIPTS FOR 5 STUDENTS
+                    Haramaya University News App
+================================================================================
+
+================================================================================
+STUDENT 1 (YOU) — Loading & Displaying News Feed
+================================================================================
+
+FILES TO OPEN:
+1. lib/screens/home_screen.dart (lines 33-92)
+2. lib/services/api_service.dart (lines 1-40)
+3. lib/models/post_model.dart (lines 23-58)
+
+---
+
+SCRIPT (5 minutes):
+
+"Hello, my name is [YOUR NAME] and my ID is [YOUR ID]. I will explain how the news feed loads and displays when the app starts.
+
+Let me open home_screen.dart. When the user opens the app, the HomeScreen widget is created and the initState method runs automatically on line 33.
+
+[POINT TO LINE 35]
+On line 35, you can see I call _loadDarkModePreference() which retrieves the saved theme preference from device storage using SharedPreferences. This ensures the user's dark mode choice persists across app restarts.
+
+[POINT TO LINE 36]
+Then on line 36, I call loadPosts() which is the main function that fetches news from the API.
+
+[SCROLL TO LINE 59]
+Let me show you the loadPosts function starting at line 59. First, on line 60, I check if hasMore is false or isLoading is true. If either condition is met, the function returns early to prevent duplicate API calls.
+
+[POINT TO LINE 61]
+On line 61, I use setState to set isLoading to true. This triggers the UI to show a CircularProgressIndicator.
+
+[SCROLL TO LINE 64]
+Inside the try block on line 64, I call ApiService.fetchPostsByPage and pass the currentPage number. Let me open api_service.dart to show you what happens.
+
+[OPEN api_service.dart]
+[POINT TO LINE 25]
+Here in api_service.dart line 25, the fetchPostsByPage method constructs the API URL. On line 29, you see I append '_embed=true' to the URL. This is critical because it tells WordPress to include the featured image data directly in the response.
+
+[POINT TO LINE 30]
+On line 30, I use the http package to make a GET request to Haramaya University's WordPress REST API at www.haramaya.edu.et/wp-json/wp/v2/posts.
+
+[POINT TO LINE 33]
+If the response status code is 200 on line 33, I decode the JSON body on line 34 and map each JSON object to a Post object using Post.fromJson.
+
+[OPEN post_model.dart]
+[POINT TO LINE 23]
+Let me show you the Post.fromJson factory constructor in post_model.dart starting at line 23. This is where the magic happens.
+
+[POINT TO LINE 25-40]
+From lines 25 to 40, I try to extract the featured image from the _embedded field. WordPress embeds the full media object here. I check for wp:featuredmedia, then look for different image sizes — full, large, medium_large, or medium — and pick the best available one.
+
+[POINT TO LINE 43-49]
+If that fails, I have a fallback on lines 43-49 where I extract the image from the yoast_head meta tag using a regular expression.
+
+[POINT TO LINE 52-58]
+And as a final fallback on lines 52-58, I extract all images from the post content HTML using another regex pattern, and use the first image if no featured image was found.
+
+[BACK TO home_screen.dart]
+[POINT TO LINE 65-68]
+Back in home_screen.dart, once the API returns the posts, I check on line 65 if the list is empty. If it is, I set hasMore to false so we don't try to load more pages. Otherwise, on line 68, I add the new posts to the allPosts list and increment currentPage.
+
+[POINT TO LINE 91]
+Finally, on line 91, I call setState with isLoading = false, which triggers the UI to rebuild.
+
+[SCROLL TO LINE 169]
+Now let me show you the UI. On line 169, you see the condition: if allPosts is empty AND isLoading is true, show a CircularProgressIndicator. Otherwise, show the SingleChildScrollView with the news feed.
+
+[SCROLL TO LINE 217]
+On line 217, I have a horizontal ListView.builder for the Featured News cards. It takes the first 5 posts using allPosts.take(5).
+
+[SCROLL TO LINE 230]
+Each card shows a CachedNetworkImage on line 230 with the post's imageUrl, and the title below it on line 254.
+
+[SCROLL TO LINE 283]
+Then on line 283, I have another ListView.builder for the Latest News section, which displays all posts after the first 5 using allPosts.skip(5).
+
+This is the complete flow: User opens app → initState triggers loadPosts → API call to Haramaya's WordPress → JSON parsing with image extraction → setState updates UI → Featured cards and Latest News list render on screen.
+
+Thank you."
+
+================================================================================
+STUDENT 2 — Opening & Reading a Full Article
+================================================================================
+
+FILES TO OPEN:
+1. lib/screens/home_screen.dart (lines 223-228)
+2. lib/screens/post_detail_screen.dart (lines 1-120)
+
+---
+
+SCRIPT (5 minutes):
+
+"Hello, my name is [NAME] and my ID is [ID]. I will explain what happens when a user taps on a news article to read the full content.
+
+[OPEN home_screen.dart]
+[POINT TO LINE 223]
+Let me start in home_screen.dart at line 223. Here you see a GestureDetector wrapping each featured news card. When the user taps anywhere on the card, the onTap callback fires.
+
+[POINT TO LINE 224-227]
+On lines 224-227, I use Navigator.push to navigate to a new screen. I create a MaterialPageRoute and pass PostDetailScreen as the builder. Notice on line 226 I pass 'post: post' — this is how I send the entire Post object to the detail screen.
+
+[OPEN post_detail_screen.dart]
+[POINT TO LINE 7-9]
+Now let me open post_detail_screen.dart. On lines 7-9, you see the PostDetailScreen class has a final Post post field. This receives the data passed from the home screen.
+
+[POINT TO LINE 26-29]
+I have two helper functions. The formatDate function on line 26 takes the ISO date string from the API and converts it to a readable format like '2025-04-27'.
+
+[POINT TO LINE 31-35]
+The dayOfWeek function on line 31 extracts the day name like 'Monday' or 'Tuesday' from the date.
+
+[POINT TO LINE 60]
+Now let me show you the UI. The build method starts at line 60. On line 61, I have an AppBar with the post title.
+
+[POINT TO LINE 66-68]
+On lines 66-68, I added a Share button in the AppBar actions. When tapped, it calls _sharePost which I'll explain shortly.
+
+[POINT TO LINE 75-77]
+On line 75, I check if the post has an imageUrl. If it does, I display it using CachedNetworkImage on line 77.
+
+[POINT TO LINE 79-82]
+The image has a height of 220 pixels, rounded corners with BorderRadius.circular(16), and BoxFit.cover to fill the space nicely.
+
+[POINT TO LINE 84]
+If there's a placeholder while loading, I show a CircularProgressIndicator on line 84.
+
+[POINT TO LINE 87-97]
+If the image fails to load, the errorWidget on line 87 shows a broken_image icon.
+
+[POINT TO LINE 99-109]
+If there's no imageUrl at all, I show a grey Container with an image_not_supported icon as a fallback on lines 99-109.
+
+[POINT TO LINE 111-117]
+Below the image, on line 111, I display the post title using Theme.of(context).textTheme.headlineSmall with bold orange text.
+
+[POINT TO LINE 121-133]
+On lines 121-133, I show the day of the week and the formatted date in a Row. For example, 'Monday 2025-04-27'.
+
+[POINT TO LINE 135]
+Then I have a Divider on line 135 to separate the header from the content.
+
+[POINT TO LINE 136-141]
+This is the most important part — on line 136, I use HtmlWidget from the flutter_widget_from_html package. I pass post.content which is raw HTML from WordPress. The HtmlWidget automatically renders all the HTML tags like paragraphs, bold text, links, and even embedded images.
+
+[POINT TO LINE 38-41]
+Now let me explain the Share button. Scroll up to line 38. The _sharePost function uses the share_plus plugin. On line 39, I call Share.share and pass a string containing the post title and link. This opens the device's native share sheet where the user can share via WhatsApp, Telegram, Email, etc.
+
+[POINT TO LINE 143-230]
+Below the content, starting at line 143, I have four reaction buttons: Like, Dislike, Heart, and Fire. Each button has an IconButton with an onPressed callback that updates the state and shows a Snackbar. My colleague will explain this in detail.
+
+So to summarize: User taps a card in home_screen → Navigator.push sends the Post object to PostDetailScreen → The screen displays the image, title, date, and HTML content using HtmlWidget → User can share the article via the Share button.
+
+Thank you."
+
+================================================================================
+STUDENT 3 — Reacting to an Article + Snackbar Feedback
+================================================================================
+
+FILES TO OPEN:
+1. lib/screens/post_detail_screen.dart (lines 14-62, 143-230)
+
+---
+
+SCRIPT (5 minutes):
+
+"Hello, my name is [NAME] and my ID is [ID]. I will explain the reaction system where users can like, dislike, heart, or fire an article, and how we show feedback using Snackbars.
+
+[OPEN post_detail_screen.dart]
+[POINT TO LINE 14-24]
+Let me start at line 14 in post_detail_screen.dart. Here I declare four boolean state variables: isLiked, isHearted, isFired, and isDisliked. These track which reaction the user has selected.
+
+[POINT TO LINE 17-20]
+On lines 17-20, I have four integer counters: likeCount, dislikeCount, heartCount, and fireCount. These store how many times each reaction has been tapped.
+
+[POINT TO LINE 43-50]
+Now let me show you the _showReactionSnackbar function on line 43. This function takes a reaction string like '👍 Like' and displays a Snackbar at the bottom of the screen.
+
+[POINT TO LINE 44-49]
+On line 44, I use ScaffoldMessenger.of(context).showSnackBar. The SnackBar widget on line 45 has a Text that says 'You reacted with [reaction]!'. The duration is 1 second on line 46, and I set behavior to SnackBarBehavior.floating on line 47 so it floats above the bottom of the screen instead of being fixed.
+
+[POINT TO LINE 53-66]
+Now let me explain the resetOtherReactions function on line 53. This is crucial because a user can only have ONE active reaction at a time. If they tap Like, then tap Heart, the Like should be removed.
+
+[POINT TO LINE 54-57]
+On lines 54-57, if the tapped reaction is NOT 'like', but isLiked is true, I set isLiked to false and decrement likeCount.
+
+[POINT TO LINE 58-61]
+The same logic applies for dislike on lines 58-61, heart on lines 62-65, and fire on lines 66-69. This ensures only one reaction is active at any time.
+
+[SCROLL TO LINE 143]
+Now let me show you the UI. On line 143, I have a Row with mainAxisAlignment.spaceAround to evenly distribute the four reaction buttons.
+
+[POINT TO LINE 146-169]
+The first button is the Like button starting at line 146. It's wrapped in a Column so the icon and count are stacked vertically.
+
+[POINT TO LINE 148-151]
+On line 148, I have an IconButton with a thumb_up icon. The color on line 150 is conditional: if isLiked is true, the icon is orange (Color(0xFFF6B331)), otherwise it's grey.
+
+[POINT TO LINE 152-165]
+Now the onPressed callback on line 152 is where the magic happens. Let me walk through it step by step.
+
+[POINT TO LINE 153]
+On line 153, I wrap everything in setState so the UI rebuilds after the state changes.
+
+[POINT TO LINE 154]
+On line 154, I check if isLiked is false — meaning the user is tapping Like for the first time.
+
+[POINT TO LINE 155]
+If true, on line 155 I call resetOtherReactions('like') to clear any other active reactions.
+
+[POINT TO LINE 156]
+Then on line 156, I set isLiked to true.
+
+[POINT TO LINE 157]
+On line 157, I increment likeCount by 1.
+
+[POINT TO LINE 158]
+And on line 158, I call _showReactionSnackbar('👍 Like') to show the feedback Snackbar.
+
+[POINT TO LINE 159-162]
+If isLiked is already true (the else block on line 159), that means the user is tapping the same button again to remove their reaction. So I set isLiked to false on line 160 and decrement likeCount on line 161.
+
+[POINT TO LINE 167]
+Below the IconButton, on line 167, I display the count using Text('$likeCount').
+
+[POINT TO LINE 170-230]
+The exact same logic is repeated for the Dislike button on lines 170-193, Heart button on lines 194-217, and Fire button on lines 218-241. The only differences are the icon, color, and reaction name passed to the Snackbar.
+
+Let me demonstrate the flow: User taps the Like button → onPressed fires → setState begins → resetOtherReactions clears other reactions → isLiked becomes true → likeCount increments → _showReactionSnackbar shows 'You reacted with 👍 Like!' → setState completes → UI rebuilds with orange icon and updated count → Snackbar appears at the bottom for 1 second.
+
+This provides instant visual feedback to the user confirming their action. The Snackbar is a requirement from the project specification for user feedback components.
+
+Thank you."
+
+================================================================================
+STUDENT 4 — Searching for a News Article
+================================================================================
+
+FILES TO OPEN:
+1. lib/screens/search_screen.dart (lines 1-200)
+2. lib/screens/home_screen.dart (line 127)
+
+---
+
+SCRIPT (5 minutes):
+
+"Hello, my name is [NAME] and my ID is [ID]. I will explain how the search functionality works, including real-time filtering and keyword highlighting.
+
+[OPEN home_screen.dart]
+[POINT TO LINE 127]
+Let me start by showing you how the user navigates to the search screen. In home_screen.dart on line 127, when the user taps the Search icon in the bottom navigation bar, I use Navigator.push to open the SearchScreen.
+
+[POINT TO LINE 130]
+Notice on line 130, I pass 'settings: RouteSettings(arguments: allPosts)'. This sends the entire list of posts to the search screen so we can search through them without making another API call.
+
+[OPEN search_screen.dart]
+[POINT TO LINE 16-18]
+Now let me open search_screen.dart. On lines 16-18, I declare three state variables: a TextEditingController for the search input, a filteredPosts list to store matching results, and a keyword string to store what the user typed.
+
+[POINT TO LINE 20-28]
+The _filterPosts function on line 20 is the core of the search logic. It takes the allPosts list as a parameter.
+
+[POINT TO LINE 21]
+On line 21, I get the current text from the TextField using _controller.text and convert it to lowercase for case-insensitive searching.
+
+[POINT TO LINE 22-26]
+Then on line 22, I call setState to update the UI. Inside, I use the where method on line 23 to filter allPosts. For each post, I check if the title or excerpt contains the keyword using .toLowerCase().contains(keyword).
+
+[POINT TO LINE 27]
+Finally, I convert the filtered results to a list using .toList() on line 27.
+
+[POINT TO LINE 30-44]
+Now let me explain the _highlightText function on line 30. This function takes the original text, the keyword, and a highlight color, and returns a TextSpan with the keyword highlighted.
+
+[POINT TO LINE 31]
+On line 31, if the keyword is empty, I just return the plain text with no highlighting.
+
+[POINT TO LINE 32-34]
+On lines 32-34, I create an empty list of TextSpans, convert the text to lowercase for matching, and initialize a start index.
+
+[POINT TO LINE 36-42]
+The while loop on line 36 searches for the keyword in the text. On line 37, if I find a match, I add the text before the match as a plain TextSpan on line 38.
+
+[POINT TO LINE 39-40]
+Then on lines 39-40, I add the matched keyword as a TextSpan with bold font and the highlight color.
+
+[POINT TO LINE 41]
+On line 41, I update the start index to continue searching after the current match.
+
+[POINT TO LINE 43]
+After the loop, on line 43, I add any remaining text after the last match.
+
+[POINT TO LINE 44]
+Finally, on line 44, I return a TextSpan with all the children spans combined.
+
+[SCROLL TO LINE 58]
+Now let me show you the UI. On line 58, I retrieve the allPosts list that was passed from the home screen using ModalRoute.of(context)?.settings.arguments.
+
+[POINT TO LINE 68-76]
+On line 68, I have a TextField with a search icon. The decoration on line 70 shows 'Search posts...' as a hint.
+
+[POINT TO LINE 75]
+The most important part is the onChanged callback on line 75. Every time the user types a character, this callback fires and calls _filterPosts(allPosts). This gives us real-time search — results update instantly as you type.
+
+[POINT TO LINE 79-81]
+On line 79, I check if filteredPosts is empty. If it is, I show 'No posts found' on line 80. Otherwise, I show a ListView.builder with the results.
+
+[POINT TO LINE 83-86]
+The ListView.builder on line 83 uses filteredPosts.length as the itemCount, so it only shows matching posts.
+
+[SCROLL TO LINE 120]
+Inside each card, on line 120, I display the post image using CachedNetworkImage.
+
+[POINT TO LINE 165-169]
+Then on line 165, I use RichText with the _highlightText function to display the title. I pass post.title, the keyword, and a blue color. This makes the matched keyword appear in bold blue text.
+
+[POINT TO LINE 171]
+On line 171, I display the excerpt using HtmlWidget.
+
+[POINT TO LINE 48-52]
+One more thing — the extractYouTubeUrl function on line 48 checks if the post content contains a YouTube link. If it does, tapping the post opens the VideoScreen instead of PostDetailScreen. This is handled on lines 100-113.
+
+Let me summarize the flow: User taps Search icon → Navigator passes allPosts to SearchScreen → User types in TextField → onChanged fires _filterPosts → filteredPosts updates with matching posts → setState rebuilds UI → ListView shows only matching posts → _highlightText makes keywords bold and blue.
+
+This provides a smooth, instant search experience without any API calls because we're searching through data already loaded in memory.
+
+Thank you."
+
+================================================================================
+STUDENT 5 — Toggling Dark Mode + Saving Preference
+================================================================================
+
+FILES TO OPEN:
+1. lib/screens/home_screen.dart (lines 46-57, 147-152, 169-171)
+
+---
+
+SCRIPT (5 minutes):
+
+"Hello, my name is [NAME] and my ID is [ID]. I will explain how the dark mode toggle works and how we persist the user's theme preference using SharedPreferences so it's remembered even after the app is closed.
+
+[OPEN home_screen.dart]
+[POINT TO LINE 25]
+Let me start at line 25 in home_screen.dart. Here I declare a boolean state variable called isDarkMode with an initial value of false, meaning the app starts in light mode by default.
+
+[POINT TO LINE 35]
+Now look at the initState method on line 33. On line 35, the first thing I do is call _loadDarkModePreference(). This function runs when the app starts and checks if the user previously saved a theme preference.
+
+[POINT TO LINE 46-51]
+Let me show you the _loadDarkModePreference function on line 46. This is an async function because reading from device storage takes time.
+
+[POINT TO LINE 47]
+On line 47, I get an instance of SharedPreferences using await SharedPreferences.getInstance(). SharedPreferences is a key-value storage system built into Flutter that persists data on the device.
+
+[POINT TO LINE 48-50]
+Then on line 48, I call setState to update the UI. Inside, on line 49, I read the saved value using prefs.getBool('isDarkMode'). If no value exists (first time opening the app), I use the ?? operator to default to false.
+
+[POINT TO LINE 53-57]
+Now let me show you the _saveDarkModePreference function on line 53. This function takes a boolean value and saves it to device storage.
+
+[POINT TO LINE 54]
+On line 54, I get the SharedPreferences instance again.
+
+[POINT TO LINE 55]
+On line 55, I save the value using await prefs.setBool('isDarkMode', value). The key is 'isDarkMode' and the value is true or false. This writes the data to the device's persistent storage.
+
+[POINT TO LINE 147-152]
+Now let me show you the toggleTheme function on line 147. This is called when the user taps the theme toggle button.
+
+[POINT TO LINE 148-150]
+On line 148, I call setState and flip the isDarkMode boolean using the ! operator. If it was true, it becomes false, and vice versa.
+
+[POINT TO LINE 151]
+Then on line 151, I immediately call _saveDarkModePreference(isDarkMode) to save the new preference to device storage. This ensures the choice is persisted.
+
+[SCROLL TO LINE 169]
+Now let me show you where the theme is actually applied. On line 169, I have a MaterialApp widget.
+
+[POINT TO LINE 171]
+On line 171, I set the theme property using a ternary operator: isDarkMode ? ThemeData.dark() : ThemeData.light(). If isDarkMode is true, the entire app uses Flutter's built-in dark theme. Otherwise, it uses the light theme.
+
+[SCROLL TO LINE 203]
+Now let me show you the UI button. On line 203, I have an IconButton in the AppBar actions.
+
+[POINT TO LINE 204-206]
+On line 204, the icon changes based on isDarkMode. If it's true, I show a dark_mode_sharp icon (moon). If false, I show a light_mode icon (sun). This gives the user a visual indicator of the current theme.
+
+[POINT TO LINE 207]
+On line 207, the onPressed callback calls toggleTheme.
+
+Let me walk through the complete flow step by step:
+
+FIRST TIME USER OPENS THE APP:
+1. initState runs on line 33
+2. _loadDarkModePreference is called on line 35
+3. SharedPreferences.getInstance() is called on line 47
+4. prefs.getBool('isDarkMode') returns null because no value exists yet
+5. The ?? false operator defaults to false on line 49
+6. setState updates isDarkMode to false
+7. MaterialApp uses ThemeData.light() on line 171
+8. App displays in light mode
+
+USER TAPS THE THEME BUTTON:
+1. onPressed fires on line 207
+2. toggleTheme is called on line 147
+3. setState flips isDarkMode from false to true on line 149
+4. _saveDarkModePreference(true) is called on line 151
+5. prefs.setBool('isDarkMode', true) writes to device storage on line 55
+6. MaterialApp rebuilds with ThemeData.dark() on line 171
+7. Entire app switches to dark mode instantly
+
+USER CLOSES AND REOPENS THE APP:
+1. initState runs again on line 33
+2. _loadDarkModePreference is called on line 35
+3. prefs.getBool('isDarkMode') now returns true because we saved it earlier
+4. setState updates isDarkMode to true on line 49
+5. MaterialApp uses ThemeData.dark() on line 171
+6. App opens in dark mode — the preference was persisted!
+
+This fulfills the data persistence requirement from the project specification. The user's theme choice is stored using SharedPreferences and restored every time the app launches. The data is not just stored — it's actively used to control the app's appearance.
+
+Thank you."
+
+================================================================================
+                            END OF SCRIPTS
+================================================================================
+
+TIPS FOR ALL STUDENTS:
+
+1. BEFORE YOU START:
+   - State your name and ID clearly
+   - Open the files mentioned at the top of your section
+   - Have the app running on your phone with screen mirroring active
+
+2. WHILE PRESENTING:
+   - Point to specific line numbers as you explain
+   - Scroll slowly so viewers can see the code
+   - Use the demo app to show the feature working in real-time
+   - Speak clearly and at a moderate pace
+
+3. PRACTICE:
+   - Read your script out loud 2-3 times before recording
+   - Time yourself — aim for 4:30 to 5:30 minutes
+   - Make sure you understand every line of code you're explaining
+
+4. RECORDING TIPS:
+   - Use good lighting so your face is visible
+   - Minimize background noise
+   - Share your screen showing Android Studio with the code
+   - Have the phone screen mirrored next to the code window
+   - Do NOT pause or cut — record continuously
+
+Good luck with your presentation!

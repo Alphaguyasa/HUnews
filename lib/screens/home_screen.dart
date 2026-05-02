@@ -9,12 +9,14 @@ import '../services/api_service.dart';
 import 'post_detail_screen.dart';
 import 'search_screen.dart';
 
+// 1
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
+
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Post> allPosts = [];
@@ -29,6 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final Color telegramBlue = const Color(0xFF229ED9);
   final Color websiteGreen = const Color(0xFF2E7D32);
 
+
+// 2
   @override
   void initState() {
     super.initState();
@@ -43,6 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+
+// 3
   Future<void> _loadDarkModePreference() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -55,6 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
     await prefs.setBool('isDarkMode', value);
   }
 
+
+// 4
   Future<void> loadPosts() async {
     if (!hasMore || isLoading) return;
     setState(() => isLoading = true);
@@ -151,6 +159,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+
+// 5
   @override
   Widget build(BuildContext context) {
     final featuredPosts = allPosts.take(5).toList();
@@ -160,6 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
       debugShowCheckedModeBanner: false,
       theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
       home: Scaffold(
+        // 6
         appBar: AppBar(
           backgroundColor: Colors.white,
           title: Row(
@@ -194,6 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+        // 7
         body: Stack(
           children: [
             allPosts.isEmpty && isLoading
@@ -205,6 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const Padding(
                     padding: EdgeInsets.all(12.0),
+                    // 8
                     child: Text("Featured News",
                         style: TextStyle(
                             fontSize: 20,
@@ -288,6 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const Padding(
                     padding: EdgeInsets.all(12.0),
+                    // 9
                     child: Text("Latest News",
                         style: TextStyle(
                             fontSize: 20,
@@ -415,6 +429,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     offset: const Offset(0, 5)),
               ],
             ),
+            // 10
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,

@@ -331,8 +331,7 @@ flutter build apk --release
 
 <div align="center">
 
-### 📹 [Watch on Loom](#)
-*Replace `#` with your Loom recording link*
+### 📹 [Watch on Loom](https://www.loom.com/share/448312eea5f94d8c94f9887fa15d6742)
 
 `25–30 min` &nbsp;·&nbsp; `Continuous recording` &nbsp;·&nbsp; `Face visible` &nbsp;·&nbsp; `Show Touches enabled`
 
