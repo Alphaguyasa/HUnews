@@ -102,13 +102,13 @@ The project demonstrates end-to-end mobile development skills — from API integ
 
 ## Screens
 
-| Screen | Route | Description |
-|:---|:---:|:---|
-| **Onboarding** | Entry | HU-branded welcome screen; requests notification permission before proceeding |
-| **Home Feed** | `/home` | Featured carousel (top 5) + paginated latest news list with dark mode toggle |
-| **Article Detail** | `/detail` | Full article view with image, HTML content, date, reactions, and share button |
-| **Search** | `/search` | Real-time search with keyword-highlighted results; navigates to detail or video |
-| **Video Player** | `/video` | Full-screen YouTube player with progress bar, speed control, and captions |
+| Screen             |   Route   | Description                                                                     |
+| :----------------- | :-------: | :------------------------------------------------------------------------------ |
+| **Onboarding**     |   Entry   | HU-branded welcome screen; requests notification permission before proceeding   |
+| **Home Feed**      |  `/home`  | Featured carousel (top 5) + paginated latest news list with dark mode toggle    |
+| **Article Detail** | `/detail` | Full article view with image, HTML content, date, reactions, and share button   |
+| **Search**         | `/search` | Real-time search with keyword-highlighted results; navigates to detail or video |
+| **Video Player**   | `/video`  | Full-screen YouTube player with progress bar, speed control, and captions       |
 
 ---
 
@@ -157,41 +157,44 @@ News_App_Internship/
 
 ### Core
 
-| Technology | Version | Purpose |
-|:---|:---:|:---|
-| Flutter | 3.x | Cross-platform UI framework |
-| Dart | 3.x | Programming language |
-| WordPress REST API | v2 | Live news data source |
+| Technology         | Version | Purpose                     |
+| :----------------- | :-----: | :-------------------------- |
+| Flutter            |   3.x   | Cross-platform UI framework |
+| Dart               |   3.x   | Programming language        |
+| WordPress REST API |   v2    | Live news data source       |
 
 ### Dependencies
 
-| Package | Version | Purpose |
-|:---|:---:|:---|
-| `http` | ^1.5.0 | HTTP requests to the WordPress API |
-| `shared_preferences` | ^2.3.2 | Persistent dark mode preference storage |
-| `cached_network_image` | ^3.4.1 | Network image loading with disk caching |
-| `flutter_widget_from_html` | ^0.17.1 | Renders WordPress HTML article content |
-| `share_plus` | ^10.0.0 | Native OS share sheet integration |
-| `permission_handler` | ^11.3.1 | Runtime Android permission management |
-| `youtube_player_flutter` | ^9.1.3 | Embedded YouTube video playback |
-| `url_launcher` | ^6.3.0 | Opens external links in the browser |
-| `flutter_inappwebview` | ^6.1.5 | In-app web view support |
+| Package                    | Version | Purpose                                 |
+| :------------------------- | :-----: | :-------------------------------------- |
+| `http`                     | ^1.5.0  | HTTP requests to the WordPress API      |
+| `shared_preferences`       | ^2.3.2  | Persistent dark mode preference storage |
+| `cached_network_image`     | ^3.4.1  | Network image loading with disk caching |
+| `flutter_widget_from_html` | ^0.17.1 | Renders WordPress HTML article content  |
+| `share_plus`               | ^10.0.0 | Native OS share sheet integration       |
+| `permission_handler`       | ^11.3.1 | Runtime Android permission management   |
+| `youtube_player_flutter`   | ^9.1.3  | Embedded YouTube video playback         |
+| `url_launcher`             | ^6.3.0  | Opens external links in the browser     |
+| `flutter_inappwebview`     | ^6.1.5  | In-app web view support                 |
 
 ---
 
 ## API Integration
 
 **Base URL**
+
 ```
 https://www.haramaya.edu.et/wp-json/wp/v2/posts
 ```
 
 **Paginated News Request**
+
 ```
 GET /posts?page={n}&per_page=10&categories={news_id}&_embed=true
 ```
 
 **Category Discovery**
+
 ```
 GET /categories?slug=news  →  resolves category ID dynamically
 ```
@@ -200,11 +203,11 @@ GET /categories?slug=news  →  resolves category ID dynamically
 
 The app uses a three-tier fallback to guarantee an image is always shown:
 
-| Priority | Source | Field |
-|:---:|:---|:---|
-| 1st | WordPress embedded featured media | `_embedded['wp:featuredmedia'][0].source_url` |
-| 2nd | Yoast SEO open graph meta tag | `yoast_head` → `<meta property="og:image">` |
-| 3rd | First inline image in article body | First `<img src="...">` in `content.rendered` |
+| Priority | Source                             | Field                                         |
+| :------: | :--------------------------------- | :-------------------------------------------- |
+|   1st    | WordPress embedded featured media  | `_embedded['wp:featuredmedia'][0].source_url` |
+|   2nd    | Yoast SEO open graph meta tag      | `yoast_head` → `<meta property="og:image">`   |
+|   3rd    | First inline image in article body | First `<img src="...">` in `content.rendered` |
 
 ---
 
@@ -214,16 +217,16 @@ The app uses a three-tier fallback to guarantee an image is always shown:
 <summary><b>UI &amp; Interaction</b></summary>
 <br>
 
-| Requirement | Status | Where |
-|:---|:---:|:---|
-| Stateless widget | ✅ | `OnboardingScreen` — `StatelessWidget` |
-| Stateful widget | ✅ | `HomeScreen`, `PostDetailScreen`, `SearchScreen`, `VideoScreen` |
-| Row | ✅ | AppBar title, date display, reaction buttons |
-| Column | ✅ | Primary layout on all screens |
-| Stack | ✅ | Home body — FAB overlaid on scroll content |
-| Responsive design | ✅ | `MediaQuery` in onboarding; flexible sizing throughout |
-| Input field | ✅ | `TextField` with search icon in `SearchScreen` |
-| Snackbar feedback | ✅ | Reaction confirmation + network error with Retry |
+| Requirement       | Status | Where                                                           |
+| :---------------- | :----: | :-------------------------------------------------------------- |
+| Stateless widget  |   ✅   | `OnboardingScreen` — `StatelessWidget`                          |
+| Stateful widget   |   ✅   | `HomeScreen`, `PostDetailScreen`, `SearchScreen`, `VideoScreen` |
+| Row               |   ✅   | AppBar title, date display, reaction buttons                    |
+| Column            |   ✅   | Primary layout on all screens                                   |
+| Stack             |   ✅   | Home body — FAB overlaid on scroll content                      |
+| Responsive design |   ✅   | `MediaQuery` in onboarding; flexible sizing throughout          |
+| Input field       |   ✅   | `TextField` with search icon in `SearchScreen`                  |
+| Snackbar feedback |   ✅   | Reaction confirmation + network error with Retry                |
 
 </details>
 
@@ -231,12 +234,12 @@ The app uses a three-tier fallback to guarantee an image is always shown:
 <summary><b>Navigation &amp; State Management</b></summary>
 <br>
 
-| Requirement | Status | Where |
-|:---|:---:|:---|
-| Push navigation | ✅ | `Navigator.push` → Detail, Search, Video |
-| Pop navigation | ✅ | System back button on all secondary screens |
-| Data passing | ✅ | `Post` via constructor; `allPosts` via `RouteSettings.arguments` |
-| `setState()` | ✅ | All Stateful screens — loading, reactions, theme, search |
+| Requirement     | Status | Where                                                            |
+| :-------------- | :----: | :--------------------------------------------------------------- |
+| Push navigation |   ✅   | `Navigator.push` → Detail, Search, Video                         |
+| Pop navigation  |   ✅   | System back button on all secondary screens                      |
+| Data passing    |   ✅   | `Post` via constructor; `allPosts` via `RouteSettings.arguments` |
+| `setState()`    |   ✅   | All Stateful screens — loading, reactions, theme, search         |
 
 </details>
 
@@ -244,10 +247,10 @@ The app uses a three-tier fallback to guarantee an image is always shown:
 <summary><b>Data Persistence</b></summary>
 <br>
 
-| Requirement | Status | Where |
-|:---|:---:|:---|
-| Key-value storage | ✅ | `SharedPreferences.setBool('isDarkMode', value)` |
-| Data actively used | ✅ | Read in `initState()`, applied to `MaterialApp` theme every launch |
+| Requirement        | Status | Where                                                              |
+| :----------------- | :----: | :----------------------------------------------------------------- |
+| Key-value storage  |   ✅   | `SharedPreferences.setBool('isDarkMode', value)`                   |
+| Data actively used |   ✅   | Read in `initState()`, applied to `MaterialApp` theme every launch |
 
 </details>
 
@@ -255,13 +258,13 @@ The app uses a three-tier fallback to guarantee an image is always shown:
 <summary><b>Networking &amp; API Integration</b></summary>
 <br>
 
-| Requirement | Status | Where |
-|:---|:---:|:---|
-| Public API | ✅ | WordPress REST API — `haramaya.edu.et` |
-| JSON parsing | ✅ | `Post.fromJson()` in `post_model.dart` |
-| Fetched data displayed | ✅ | Home, Search, and Detail screens |
-| Loading indicator | ✅ | `CircularProgressIndicator` during all fetches |
-| Error handling | ✅ | `try/catch` → Snackbar with Retry in `home_screen.dart` |
+| Requirement            | Status | Where                                                   |
+| :--------------------- | :----: | :------------------------------------------------------ |
+| Public API             |   ✅   | WordPress REST API — `haramaya.edu.et`                  |
+| JSON parsing           |   ✅   | `Post.fromJson()` in `post_model.dart`                  |
+| Fetched data displayed |   ✅   | Home, Search, and Detail screens                        |
+| Loading indicator      |   ✅   | `CircularProgressIndicator` during all fetches          |
+| Error handling         |   ✅   | `try/catch` → Snackbar with Retry in `home_screen.dart` |
 
 </details>
 
@@ -269,13 +272,13 @@ The app uses a three-tier fallback to guarantee an image is always shown:
 <summary><b>Device Features &amp; Plugin Integration</b></summary>
 <br>
 
-| Requirement | Status | Where |
-|:---|:---:|:---|
-| Flutter plugin | ✅ | `share_plus`, `permission_handler`, `youtube_player_flutter` |
-| Device feature | ✅ | Native share sheet via `share_plus` on every article |
-| Permission request | ✅ | Notification permission on onboarding via `permission_handler` |
-| Permission response | ✅ | Graceful handling — app proceeds on both grant and denial |
-| Fully integrated | ✅ | Share on every article; permission on every first launch |
+| Requirement         | Status | Where                                                          |
+| :------------------ | :----: | :------------------------------------------------------------- |
+| Flutter plugin      |   ✅   | `share_plus`, `permission_handler`, `youtube_player_flutter`   |
+| Device feature      |   ✅   | Native share sheet via `share_plus` on every article           |
+| Permission request  |   ✅   | Notification permission on onboarding via `permission_handler` |
+| Permission response |   ✅   | Graceful handling — app proceeds on both grant and denial      |
+| Fully integrated    |   ✅   | Share on every article; permission on every first launch       |
 
 </details>
 
@@ -285,11 +288,11 @@ The app uses a three-tier fallback to guarantee an image is always shown:
 
 ### Prerequisites
 
-| Tool | Version | Download |
-|:---|:---:|:---|
-| Flutter SDK | 3.x+ | [flutter.dev](https://flutter.dev/docs/get-started/install) |
-| Android Studio | Latest | [developer.android.com](https://developer.android.com/studio) |
-| Android Device / Emulator | API 21+ | Physical device or AVD |
+| Tool                      | Version | Download                                                      |
+| :------------------------ | :-----: | :------------------------------------------------------------ |
+| Flutter SDK               |  3.x+   | [flutter.dev](https://flutter.dev/docs/get-started/install)   |
+| Android Studio            | Latest  | [developer.android.com](https://developer.android.com/studio) |
+| Android Device / Emulator | API 21+ | Physical device or AVD                                        |
 
 ### Run Locally
 
@@ -316,12 +319,12 @@ flutter build apk --release
 
 ## Installation
 
-| Step | Action |
-|:---:|:---|
-| 1 | [Download `app-release.apk`](./apk/app-release.apk) from the `/apk` folder |
-| 2 | On your phone: **Settings → Security → Install unknown apps → Enable** |
-| 3 | Open the APK file and tap **Install** |
-| 4 | Launch **HU News** from your app drawer |
+| Step | Action                                                                     |
+| :--: | :------------------------------------------------------------------------- |
+|  1   | [Download `app-release.apk`](./apk/app-release.apk) from the `/apk` folder |
+|  2   | On your phone: **Settings → Security → Install unknown apps → Enable**     |
+|  3   | Open the APK file and tap **Install**                                      |
+|  4   | Launch **HU News** from your app drawer                                    |
 
 > **Note:** An active internet connection is required to load articles and images.
 
@@ -343,13 +346,13 @@ flutter build apk --release
 
 <div align="center">
 
-| # | Name | Student ID | Presentation Topic |
-|:---:|:---|:---:|:---|
-| 1 | Alpha Guyasa | 5756/15 | API Integration — Loading & Displaying the News Feed |
-| 2 | Abdi Fekeda | 0016/15 | Navigation — Opening & Reading a Full Article |
-| 3 | Milkesa Eshetu | 0743/15 | State Management — Reactions & Snackbar Feedback |
-| 4 | Kenesa Asfaw | 0628/15 | Search — Real-time Filtering & Keyword Highlighting |
-| 5 | Fethiya Muhajir | 0421/15 | Persistence — Dark Mode Toggle & SharedPreferences |
+|  #  | Name            | Student ID | Presentation Topic     |
+| :-: | :-------------- | :--------: | :--------------------- |
+|  1  | Alpha Guyasa    |  5756/15   | Home Screen            |
+|  2  | Abdi Fekeda     |  0016/15   | Onboarding page        |
+|  3  | Milkesa Eshetu  |  0743/15   | api and website        |
+|  4  | Kenesa Asfaw    |  0628/15   | Search — telegram page |
+|  5  | Fethiya Muhajir |  0421/15   | refresh page           |
 
 </div>
 
